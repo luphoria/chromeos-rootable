@@ -33,11 +33,10 @@
                 pwnable["v101"] = false;
             }
             if(!hasARC) {
-                print("No ARC. Disabling v76, v80, v87, and v91.");
+                print("No ARC. Disabling v76, v80, and v87.");
                 pwnable["v76"] = false;
                 pwnable["v80"] = false;
                 pwnable["v87"] = false;
-                pwnable["v91"] = false;
             }
             if(!hasOldLegacyCrosh && !hasKiosk) {
                 print("No old-legacy crosh, and no kiosk apps. Disabling v76 and v80.");
