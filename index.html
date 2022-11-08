@@ -22,14 +22,14 @@
                 "v76": BOARD.images.find(image => image.params.chrome.split(".")[0] == "76") ? true : false,
                 "v80": BOARD.images.find(image => image.params.chrome.split(".")[0] == "80") ? true : false,
                 "v87": BOARD.images.find(image => image.params.chrome.split(".")[0] == "87") ? true : false,
-                "pv13904.64.0": BOARD.images.find(image => (image.params.chrome.split(".")[0] == "91" && parseInt(image.params.platform.split(".")[1]) <= 64)) ? true : false,
+                "v91": BOARD.images.find(image => (image.params.chrome.split(".")[0] == "91" && parseInt(image.params.platform.split(".")[1]) <= 64)) ? true : false,
                 "v101": BOARD.images.find(image => image.params.chrome.split(".")[0] == "101") ? true : false
             }
             print(JSON.stringify(downgradable));
             let pwnable = downgradable;
             if(!hasDriveFS) {
                 print("No drivefs. Disabling v101 and v91.");
-                pwnable["pv13904.64.0"] = false;
+                pwnable["v91"] = false;
                 pwnable["v101"] = false;
             }
             if(!hasARC) {
@@ -37,7 +37,7 @@
                 pwnable["v76"] = false;
                 pwnable["v80"] = false;
                 pwnable["v87"] = false;
-                pwnable["pv13904.64.0"] = false;
+                pwnable["v91"] = false;
             }
             if(!hasOldLegacyCrosh && !hasKiosk) {
                 print("No old-legacy crosh, and no kiosk apps. Disabling v76 and v80.");
@@ -50,7 +50,7 @@
             }
             if(!hasCrosh) {
                 print("No crosh. Disabling v91.");
-                pwnable["pv13904.64.0"] = false;
+                pwnable["v91"] = false;
             }
             if(!hasCrosh && !hasTerminal) {
                 print("No crosh and no terminal. Disabling v101.");
@@ -90,6 +90,7 @@
     <div id="log">
         <h2 id="result"></h2>
         <h3 id="further-result"></h3>
+        <i>Notice: v91 is only exploitable on <b>platform version v13904.64.0</b> or lower. The tool filters out boards which do not include these platform versions, but some boards have multiple v91 builds.</i><br/>
         <code id="all-logging"></code>
     </div>
 </body>
