@@ -33,11 +33,10 @@
                 pwnable["v101"] = false;
             }
             if(!hasARC) {
-                print("No ARC. Disabling v91.");
-                // TODO : Test no-arc on the following. They have references to ARC but not sure if necessary for exploit.
-                // pwnable["v76"] = false;
-                // pwnable["v80"] = false;
-                // pwnable["v87"] = false;
+                print("No ARC. Disabling v76, v80, v87, and v91.");
+                pwnable["v76"] = false;
+                pwnable["v80"] = false;
+                pwnable["v87"] = false;
                 pwnable["pv13904.64.0"] = false;
             }
             if(!hasOldLegacyCrosh && !hasKiosk) {
