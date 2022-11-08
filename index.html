@@ -45,6 +45,10 @@
                 pwnable["v76"] = false;
                 pwnable["v80"] = false;
             }
+            if(!hasLegacyCrosh) {
+                print("No legacy crosh. Disabling v87.");
+                pwnable["v87"] = false;
+            }
             if(!hasCrosh) {
                 print("No crosh. Disabling v91.");
                 pwnable["pv13904.64.0"] = false;
