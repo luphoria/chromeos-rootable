@@ -15,7 +15,6 @@
                 hasLegacyCrosh = document.getElementById("hasLegacyCrosh").checked,
                 hasCrosh = document.getElementById("hasCrosh").checked,
                 hasTerminal = document.getElementById("hasTerminal").checked,
-                hasKiosk = document.getElementById("hasKiosk").checked,
                 hasDriveFS = document.getElementById("hasDriveFS").checked,
                 hasARC = document.getElementById("hasARC").checked;
             let downgradable = {
@@ -77,11 +76,11 @@
     <div>
         Board: <input id="board" type="text" placeholder="reks"/><br />
         <i>These are additional settings and miscellaneous prerequisites for the root exploits. If you don't know, leave it checked.</i><br />
-        <input type="checkbox" id="hasOldLegacyCrosh" checked> Can visit old legacy crosh (&lt;v80)<br />
-        <input type="checkbox" id="hasLegacyCrosh" checked> Can visit legacy crosh (v87&lt;v91&lt;v98)<br />
+        <!-- TODO: Accept policies.json file as input to automatically check these boxes. -->
+        <input type="checkbox" id="hasOldLegacyCrosh" checked> Can visit chrome-extension://pnhechapfaindjhompbnflcldabbghjo/html/crosh.html<br />
+        <input type="checkbox" id="hasLegacyCrosh" checked> Can visit chrome-extension://nkoccljplnhpfnfiajclkommnmllphnl/html/crosh.html<br />
         <input type="checkbox" id="hasCrosh" checked> Can visit crosh (chrome-untrusted://crosh)<br />
         <input type="checkbox" id="hasTerminal" checked> Can visit Terminal (chrome://terminal)<br />
-        <input type="checkbox" id="hasKiosk" checked> Have one or more "kiosk apps"<br />
         <input type="checkbox" id="hasDriveFS" checked> Has Google Drive files in the file manager app<br />
         <input type="checkbox" id="hasARC" checked> Has Google Play/Android/ARC enabled<br />
         <button onclick="canRootBoard(document.getElementById('board').value)">go</button>
