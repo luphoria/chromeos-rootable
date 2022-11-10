@@ -37,8 +37,8 @@
                 pwnable["v80"] = false;
                 pwnable["v87"] = false;
             }
-            if(!hasOldLegacyCrosh && !hasKiosk) {
-                print("No old-legacy crosh, and no kiosk apps. Disabling v76 and v80.");
+            if(!hasOldLegacyCrosh) {
+                print("No old-legacy crosh. Disabling v76 and v80.");
                 pwnable["v76"] = false;
                 pwnable["v80"] = false;
             }
