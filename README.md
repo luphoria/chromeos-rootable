@@ -1,4 +1,4 @@
-# chrootable
+# chromeos-rootable
 check chromeOS boards for verified working root privilege escalation
 
 ## usage
