@@ -91,5 +91,14 @@
         <i>Notice: v91 is only exploitable on <b>platform version v13904.64.0</b> or lower. The tool filters out boards which do not include these platform versions, but some boards have multiple v91 builds.</i><br/>
         <code id="all-logging"></code>
     </div>
+    <h1>My device is rootable! What now?</h1>
+    <ol>
+        <li>Download your board's (rootable) recovery image: <a href="https://chrome100.dev/">https://chrome100.dev/</a></li>
+        <li>Make a recovery image with either of the following flashing utilites: <a href="https://www.balena.io/etcher/">balenaEtcher</a> <a href="https://chrome.google.com/webstore/detail/chromebook-recovery-utili/pocpnlppkickgojjlmhdmidojbmbodfm">Chromebook Recovery Utility</a></li>
+        <li>Press ESC+REFRESH+POWER to enter recovery mode and insert your recovery media</li>
+        <l1>Wait for the recovery to finish</l1>
+        <li>Login, open crosh and type set_cellular_ppp \';bash;exit\' then <a href="https://coolelectronics.me/unroll">choose an exploit for your version</a></li>
+        <li>Done! You should now have root.</li>
+    </ol>
 </body>
 </html>
