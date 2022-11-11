@@ -20,6 +20,7 @@
             let downgradable = {
                 "v76": BOARD.images.find(image => image.params.chrome.split(".")[0] == "76") ? true : false,
                 "v80": BOARD.images.find(image => image.params.chrome.split(".")[0] == "80") ? true : false,
+                "v83": BOARD.images.find(image => image.params.chrome.split(".")[0] == "83") ? true : false,
                 "v87": BOARD.images.find(image => image.params.chrome.split(".")[0] == "87") ? true : false,
                 "v91": BOARD.images.find(image => (image.params.chrome.split(".")[0] == "91" && parseInt(image.params.platform.split(".")[1]) <= 64)) ? true : false,
                 "v101": BOARD.images.find(image => image.params.chrome.split(".")[0] == "101") ? true : false
@@ -35,13 +36,15 @@
                 print("WARNING: No ARC.");
             //    pwnable["v76"] = false;
             //    pwnable["v80"] = false;
+            //    pwnable["v83"] = false;
             //    pwnable["v87"] = false;
             }
-            //if(!hasOldLegacyCrosh) {
-            //    print("No old-legacy crosh. Disabling v76 and v80.");
+            if(!hasOldLegacyCrosh) {
+                print("No old-legacy crosh. Disabling v83.");
             //    pwnable["v76"] = false;
             //    pwnable["v80"] = false;
-            //}
+                pwnable["v83"] = false;
+            }
             if(!hasCrosh) {
                 print("No crosh. Disabling v87 and v91.");
                 pwnable["v87"] = false;
