@@ -31,23 +31,20 @@
                 pwnable["v91"] = false;
                 pwnable["v101"] = false;
             }
-            if(!hasARC) {
-                print("No ARC. Disabling v76, v80, and v87.");
-                pwnable["v76"] = false;
-                pwnable["v80"] = false;
-                pwnable["v87"] = false;
+             if(!hasARC) {
+                print("WARNING: No ARC.");
+            //    pwnable["v76"] = false;
+            //    pwnable["v80"] = false;
+            //    pwnable["v87"] = false;
             }
-            if(!hasOldLegacyCrosh) {
-                print("No old-legacy crosh. Disabling v76 and v80.");
-                pwnable["v76"] = false;
-                pwnable["v80"] = false;
-            }
-            if(!hasLegacyCrosh) {
-                print("No legacy crosh. Disabling v87.");
-                pwnable["v87"] = false;
-            }
+            //if(!hasOldLegacyCrosh) {
+            //    print("No old-legacy crosh. Disabling v76 and v80.");
+            //    pwnable["v76"] = false;
+            //    pwnable["v80"] = false;
+            //}
             if(!hasCrosh) {
-                print("No crosh. Disabling v91.");
+                print("No crosh. Disabling v87 and v91.");
+                pwnable["v87"] = false;
                 pwnable["v91"] = false;
             }
             if(!hasCrosh && !hasTerminal) {
