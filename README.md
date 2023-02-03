@@ -9,4 +9,4 @@ check chromeOS boards for verified working root privilege escalation
 
 ## todo
  - accept a `policies.json` upload to automatically change device info
- - create interactive guide instead of just telling you what you can and can't do
+ - create a list of [latest versions of EOL boards](https://www.chromium.org/chromium-os/developer-information-for-chrome-os-devices/) (versions that don't have recovery images)
